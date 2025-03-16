@@ -147,10 +147,10 @@ class CardSwiper extends StatefulWidget {
           maxAngle >= 0 && maxAngle <= 360,
           'maxAngle must be between 0 and 360',
         ),
-        assert(
-          threshold >= 1 && threshold <= 100,
-          'threshold must be between 1 and 100',
-        ),
+        // assert(
+        //   threshold >= 1 && threshold <= 100,
+        //   'threshold must be between 1 and 100',
+        // ),
         assert(
           scale >= 0 && scale <= 1,
           'scale must be between 0 and 1',

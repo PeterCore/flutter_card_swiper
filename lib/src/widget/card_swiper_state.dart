@@ -101,7 +101,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
       top: _cardAnimation.top,
       child: GestureDetector(
         child: Transform.rotate(
-          angle: _cardAnimation.angle,
+          angle: -_cardAnimation.angle,
           child: ConstrainedBox(
             constraints: constraints,
             child: widget.cardBuilder(
@@ -218,7 +218,6 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   void _onEndAnimation() {
     final direction = _getEndAnimationDirection();
     final isValidDirection = _isValidDirection(direction);
-
     if (isValidDirection) {
       _swipe(direction);
     } else {

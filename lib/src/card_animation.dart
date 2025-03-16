@@ -57,7 +57,23 @@ class CardAnimation {
   }
 
   void update(double dx, double dy, bool inverseAngle) {
-    if (allowedSwipeDirection.right && allowedSwipeDirection.left) {
+    if (left >= 0) {
+      onSwipeDirectionChanged?.call(CardSwiperDirection.right);
+      left += dx;
+    } else if (left <= 0) {
+      onSwipeDirectionChanged?.call(CardSwiperDirection.left);
+      left += dx;
+    }
+
+    if (top >= 0) {
+      onSwipeDirectionChanged?.call(CardSwiperDirection.bottom);
+      top += dy;
+    } else if (top <= 0) {
+      onSwipeDirectionChanged?.call(CardSwiperDirection.top);
+      top += dy;
+    }
+    /////////////
+    /*if (allowedSwipeDirection.right && allowedSwipeDirection.left) {
       if (left > 0) {
         onSwipeDirectionChanged?.call(CardSwiperDirection.right);
       } else if (left < 0) {
@@ -93,7 +109,7 @@ class CardAnimation {
         onSwipeDirectionChanged?.call(CardSwiperDirection.bottom);
         top += dy;
       }
-    }
+    }*/
 
     total = left + top;
     updateAngle(inverseAngle);
