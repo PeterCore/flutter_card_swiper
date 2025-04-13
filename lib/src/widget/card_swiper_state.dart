@@ -221,7 +221,16 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     if (isValidDirection) {
       _swipe(direction);
     } else {
-      _goBack();
+      if (direction == CardSwiperDirection.top &&
+          widget.allowedDeleteDirection.up == true) {
+        final verticalThresholdPercentage =
+            ((_cardAnimation.top.abs() - widget.threshold) / widget.threshold)
+                .ceil()
+                .abs();
+        print("${verticalThresholdPercentage}");
+      } else {
+        _goBack();
+      }
     }
   }
 
@@ -299,7 +308,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     if (_currentIndex == null) {
       return 0;
     }
-
+    print("_currentIndex is ${_currentIndex}");
     return math.min(
       widget.numberOfCardsDisplayed,
       widget.cardsCount - _currentIndex!,

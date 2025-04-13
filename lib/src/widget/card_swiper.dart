@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_card_swiper/src/card_animation.dart';
 import 'package:flutter_card_swiper/src/controller/controller_event.dart';
+import 'package:flutter_card_swiper/src/properties/allowed_deleted_direction.dart';
 import 'package:flutter_card_swiper/src/utils/number_extension.dart';
 import 'package:flutter_card_swiper/src/utils/undoable.dart';
 
@@ -92,6 +93,8 @@ class CardSwiper extends StatefulWidget {
   /// Defaults to [AllowedSwipeDirection.all]
   final AllowedSwipeDirection allowedSwipeDirection;
 
+  final AllowedDeleteDirection allowedDeleteDirection;
+
   /// A boolean value that determines whether the card stack should loop. When the last card is swiped,
   /// if isLoop is true, the first card will become the last card again. The default value is true.
   final bool isLoop;
@@ -138,6 +141,7 @@ class CardSwiper extends StatefulWidget {
     this.onEnd,
     this.onSwipeDirectionChange,
     this.allowedSwipeDirection = const AllowedSwipeDirection.all(),
+    this.allowedDeleteDirection = const AllowedDeleteDirection.only(up: true),
     this.isLoop = true,
     this.numberOfCardsDisplayed = 2,
     this.onUndo,

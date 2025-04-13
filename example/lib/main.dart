@@ -42,18 +42,27 @@ class _ExamplePageState extends State<Example> {
               child: CardSwiper(
                 controller: controller,
                 cardsCount: cards.length,
+                allowedDeleteDirection: AllowedDeleteDirection.only(up: true),
+                allowedSwipeDirection: const AllowedSwipeDirection.only(
+                  left: true,
+                  right: true,
+                ),
                 onSwipe: _onSwipe,
                 onUndo: _onUndo,
                 numberOfCardsDisplayed: 3,
-                backCardOffset: const Offset(40, 40),
-                padding: const EdgeInsets.all(24.0),
+                backCardOffset: const Offset(0, -40),
+                padding: const EdgeInsets.all(24),
+                threshold: 100,
                 cardBuilder: (
                   context,
                   index,
                   horizontalThresholdPercentage,
                   verticalThresholdPercentage,
-                ) =>
-                    cards[index],
+                ) {
+                  print(
+                      "horizontalThresholdPercentage is ${horizontalThresholdPercentage} verticalThresholdPercentage is ${verticalThresholdPercentage} ");
+                  return cards[index];
+                },
               ),
             ),
             Padding(
