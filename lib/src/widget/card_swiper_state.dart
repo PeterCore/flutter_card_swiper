@@ -340,9 +340,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     if (_currentIndex == null) {
       return 0;
     }
-    print("_currentIndex is ${_currentIndex}");
     deletedList.add(_currentIndex ?? 0);
-    print("_numberOfCardsDisplayed is ${_numberOfCardsDisplayed}");
     return math.min(
       _numberOfCardsDisplayed,
       widget.cardsCount - deletedList.length,
@@ -363,7 +361,6 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
         }
       }
     }
-    print('getValidIndex is ${index}');
     return index;
     // return 0;
   }
