@@ -13,19 +13,18 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
 
   final _undoableIndex = Undoable<int?>(null);
   final Queue<CardSwiperDirection> _directionHistory = Queue();
-
+  List<int> deletedList = [];
   int? get _currentIndex => _undoableIndex.state;
 
   int? get _nextIndex => getValidIndexOffset(1);
+
+  int _numberOfCardsDisplayed = 0;
 
   bool get _canSwipe => _currentIndex != null && !widget.isDisabled;
 
   StreamSubscription<ControllerEvent>? controllerSubscription;
 
-  @override
-  void initState() {
-    super.initState();
-
+  initData() {
     _undoableIndex.state = widget.initialIndex;
 
     controllerSubscription =
@@ -46,6 +45,13 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
       initialOffset: widget.backCardOffset,
       onSwipeDirectionChanged: onSwipeDirectionChanged,
     );
+    _numberOfCardsDisplayed = widget.numberOfCardsDisplayed;
+  }
+
+  @override
+  void initState() {
+    initData();
+    super.initState();
   }
 
   void onSwipeDirectionChanged(CardSwiperDirection direction) {
@@ -83,7 +89,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
               return Stack(
                 clipBehavior: Clip.none,
                 fit: StackFit.expand,
-                children: List.generate(numberOfCardsOnScreen(), (index) {
+                children: List.generate(_numberOfCardsDisplayed, (index) {
                   if (index == 0) return _frontItem(constraints);
                   return _backItem(constraints, index);
                 }).reversed.toList(),
@@ -107,8 +113,8 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
             child: widget.cardBuilder(
               context,
               _currentIndex!,
-              (100 * _cardAnimation.left / widget.threshold).ceil(),
-              (100 * _cardAnimation.top / widget.threshold).ceil(),
+              (100 * _cardAnimation.left / widget.hThreshold).ceil(),
+              (100 * _cardAnimation.top / widget.vThreshold).ceil(),
             ),
           ),
         ),
@@ -215,19 +221,33 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     });
   }
 
+  bool _currentSwipDirectionIsDeleted() {
+    bool isDeleted = false;
+    final direction = _getEndAnimationDirection();
+    if (direction == CardSwiperDirection.top &&
+        widget.allowedDeleteDirection.up) {
+      isDeleted = true;
+    } else if (direction == CardSwiperDirection.bottom &&
+        widget.allowedDeleteDirection.down) {
+      isDeleted = true;
+    }
+    return isDeleted;
+  }
+
   void _onEndAnimation() {
     final direction = _getEndAnimationDirection();
     final isValidDirection = _isValidDirection(direction);
     if (isValidDirection) {
       _swipe(direction);
+      // setState(() {
+      //   _numberOfCardsDisplayed = numberOfCardsOnScreen();
+      // });
     } else {
-      if (direction == CardSwiperDirection.top &&
-          widget.allowedDeleteDirection.up == true) {
-        final verticalThresholdPercentage =
-            ((_cardAnimation.top.abs() - widget.threshold) / widget.threshold)
-                .ceil()
-                .abs();
-        print("${verticalThresholdPercentage}");
+      if (_currentSwipDirectionIsDeleted()) {
+        setState(() {
+          _numberOfCardsDisplayed = numberOfCardsOnScreen();
+        });
+        _swipe(direction);
       } else {
         _goBack();
       }
@@ -235,12 +255,12 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   }
 
   CardSwiperDirection _getEndAnimationDirection() {
-    if (_cardAnimation.left.abs() > widget.threshold) {
+    if (_cardAnimation.left.abs() > widget.hThreshold) {
       return _cardAnimation.left.isNegative
           ? CardSwiperDirection.left
           : CardSwiperDirection.right;
     }
-    if (_cardAnimation.top.abs() > widget.threshold) {
+    if (_cardAnimation.top.abs() > widget.vThreshold) {
       return _cardAnimation.top.isNegative
           ? CardSwiperDirection.top
           : CardSwiperDirection.bottom;
@@ -302,16 +322,20 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   }
 
   int numberOfCardsOnScreen() {
-    if (widget.isLoop) {
-      return widget.numberOfCardsDisplayed;
+    if (widget.isHloop && _cardAnimation.left.abs() > 7) {
+      return _numberOfCardsDisplayed;
+    } else if (widget.isVloop && _cardAnimation.top.abs() > 7) {
+      return _numberOfCardsDisplayed;
     }
     if (_currentIndex == null) {
       return 0;
     }
     print("_currentIndex is ${_currentIndex}");
+    deletedList.add(_currentIndex ?? 0);
+    print("_numberOfCardsDisplayed is ${_numberOfCardsDisplayed}");
     return math.min(
-      widget.numberOfCardsDisplayed,
-      widget.cardsCount - _currentIndex!,
+      _numberOfCardsDisplayed,
+      widget.cardsCount - deletedList.length,
     );
   }
 
@@ -319,11 +343,18 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     if (_currentIndex == null) {
       return null;
     }
-
-    final index = _currentIndex! + offset;
-    if (!widget.isLoop && !index.isBetween(0, widget.cardsCount - 1)) {
-      return null;
+    var index = _currentIndex! + offset;
+    index = index % widget.cardsCount;
+    if (deletedList.contains(index) && index != _currentIndex) {
+      for (var i = index + 1; i < widget.cardsCount * 2; i++) {
+        index = i % widget.cardsCount;
+        if (!deletedList.contains(index)) {
+          break;
+        }
+      }
     }
-    return index % widget.cardsCount;
+    print('getValidIndex is ${index}');
+    return index;
+    // return 0;
   }
 }

@@ -14,6 +14,10 @@ typedef CardSwiperOnSwipeUpdate = void Function(
   CardSwiperDirection direction,
 );
 
+typedef CardSwiperonDidDelete = void Function(
+  int index,
+);
+
 typedef NullableCardBuilder = Widget? Function(
   BuildContext context,
   int index,

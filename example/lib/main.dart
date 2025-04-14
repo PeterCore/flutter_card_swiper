@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:example/example_candidate_model.dart';
 import 'package:example/example_card.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,7 @@ class Example extends StatefulWidget {
 class _ExamplePageState extends State<Example> {
   final CardSwiperController controller = CardSwiperController();
 
-  final cards = candidates.map(ExampleCard.new).toList();
+  var cards = candidates.map(ExampleCard.new).toList();
 
   @override
   void dispose() {
@@ -40,27 +42,37 @@ class _ExamplePageState extends State<Example> {
           children: [
             Flexible(
               child: CardSwiper(
+                onDeleted: (index) {
+                  // print("index is ${index}");
+                  // final before = cards.sublist(0, index);
+                  // final after = cards.sublist(index + 1);
+                  // setState(() {
+                  //   cards = [...after, ...before];
+                  //   print("11111 is ${index}");
+                  // });
+                  // setState(() {
+                  //   cards.removeAt(index);
+                  // });
+                },
                 controller: controller,
                 cardsCount: cards.length,
-                allowedDeleteDirection: AllowedDeleteDirection.only(up: true),
                 allowedSwipeDirection: const AllowedSwipeDirection.only(
                   left: true,
                   right: true,
                 ),
                 onSwipe: _onSwipe,
+                vThreshold: 200,
                 onUndo: _onUndo,
-                numberOfCardsDisplayed: 3,
+                isLoop: false,
+                numberOfCardsDisplayed: min(cards.length, 4),
                 backCardOffset: const Offset(0, -40),
                 padding: const EdgeInsets.all(24),
-                threshold: 100,
                 cardBuilder: (
                   context,
                   index,
                   horizontalThresholdPercentage,
                   verticalThresholdPercentage,
                 ) {
-                  print(
-                      "horizontalThresholdPercentage is ${horizontalThresholdPercentage} verticalThresholdPercentage is ${verticalThresholdPercentage} ");
                   return cards[index];
                 },
               ),

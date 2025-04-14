@@ -6,8 +6,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_card_swiper/src/card_animation.dart';
 import 'package:flutter_card_swiper/src/controller/controller_event.dart';
-import 'package:flutter_card_swiper/src/properties/allowed_deleted_direction.dart';
-import 'package:flutter_card_swiper/src/utils/number_extension.dart';
 import 'package:flutter_card_swiper/src/utils/undoable.dart';
 
 part 'card_swiper_state.dart';
@@ -20,6 +18,8 @@ class CardSwiper extends StatefulWidget {
   /// as a percentage. The function should return a widget that represents the card at the given index.
   /// It can return `null`, which will result in an empty card being displayed.
   final NullableCardBuilder cardBuilder;
+
+  final Function(int index)? onDeleted;
 
   /// The number of cards in the stack.
   ///
@@ -57,6 +57,10 @@ class CardSwiper extends StatefulWidget {
   ///
   /// Must be between 1 and 100 percent of the card width. Defaults to 50 percent.
   final int threshold;
+
+  final int hThreshold;
+
+  final int vThreshold;
 
   /// The scale of the card that is behind the front card.
   ///
@@ -98,6 +102,9 @@ class CardSwiper extends StatefulWidget {
   /// A boolean value that determines whether the card stack should loop. When the last card is swiped,
   /// if isLoop is true, the first card will become the last card again. The default value is true.
   final bool isLoop;
+
+  final bool isVloop;
+  final bool isHloop;
 
   /// An integer that determines the number of cards that are displayed at the same time.
   /// The default value is 2. Note that you must display at least one card, and no more than the [cardsCount] parameter.
@@ -143,10 +150,15 @@ class CardSwiper extends StatefulWidget {
     this.allowedSwipeDirection = const AllowedSwipeDirection.all(),
     this.allowedDeleteDirection = const AllowedDeleteDirection.only(up: true),
     this.isLoop = true,
+    this.isVloop = false,
+    this.isHloop = true,
     this.numberOfCardsDisplayed = 2,
     this.onUndo,
+    this.onDeleted,
     this.backCardOffset = const Offset(0, 40),
     super.key,
+    this.hThreshold = 50,
+    this.vThreshold = 50,
   })  : assert(
           maxAngle >= 0 && maxAngle <= 360,
           'maxAngle must be between 0 and 360',
