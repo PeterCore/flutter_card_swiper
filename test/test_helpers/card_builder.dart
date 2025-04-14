@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 Widget? genericBuilder(
   BuildContext context,
   int index,
-  int horizontalPercentage,
-  int verticalPercentage,
+  double horizontalPercentage,
+  double verticalPercentage,
 ) {
   return Container(
     width: 200,

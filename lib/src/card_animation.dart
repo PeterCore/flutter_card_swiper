@@ -71,6 +71,7 @@ class CardAnimation {
     } else if (top <= 0 && dy.abs() > dx.abs()) {
       onSwipeDirectionChanged?.call(CardSwiperDirection.top);
       top += dy;
+      print('top is $top');
     }
     /////////////
     /*if (allowedSwipeDirection.right && allowedSwipeDirection.left) {

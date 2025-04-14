@@ -21,8 +21,8 @@ typedef CardSwiperonDidDelete = void Function(
 typedef NullableCardBuilder = Widget? Function(
   BuildContext context,
   int index,
-  int horizontalOffsetPercentage,
-  int verticalOffsetPercentage,
+  double horizontalOffsetPercentage,
+  double verticalOffsetPercentage,
 );
 
 typedef CardSwiperDirectionChange = void Function(

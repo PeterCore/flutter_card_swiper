@@ -113,8 +113,8 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
             child: widget.cardBuilder(
               context,
               _currentIndex!,
-              (100 * _cardAnimation.left / widget.hThreshold).ceil(),
-              (100 * _cardAnimation.top / widget.vThreshold).ceil(),
+              100 * _cardAnimation.left / widget.hThreshold,
+              100 * _cardAnimation.top / widget.vThreshold,
             ),
           ),
         ),
