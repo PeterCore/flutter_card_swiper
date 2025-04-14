@@ -25,6 +25,10 @@ class CardSwiperController {
     _eventController.add(ControllerMoveEvent(index));
   }
 
+  void refresh() {
+    _eventController.add(const ControllerRefreshEvent());
+  }
+
   Future<void> dispose() async {
     await _eventController.close();
   }

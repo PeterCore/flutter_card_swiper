@@ -13,6 +13,10 @@ class ControllerUndoEvent extends ControllerEvent {
   const ControllerUndoEvent();
 }
 
+class ControllerRefreshEvent extends ControllerEvent {
+  const ControllerRefreshEvent();
+}
+
 class ControllerMoveEvent extends ControllerEvent {
   final int index;
   const ControllerMoveEvent(this.index);

@@ -11,8 +11,8 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   CardSwiperDirection _detectedVerticalDirection = CardSwiperDirection.none;
   bool _tappedOnTop = false;
 
-  final _undoableIndex = Undoable<int?>(null);
-  final Queue<CardSwiperDirection> _directionHistory = Queue();
+  Undoable<int?> _undoableIndex = Undoable<int?>(null);
+  Queue<CardSwiperDirection> _directionHistory = Queue();
   List<int> deletedList = [];
   int? get _currentIndex => _undoableIndex.state;
 
@@ -24,7 +24,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
 
   StreamSubscription<ControllerEvent>? controllerSubscription;
 
-  initData() {
+  void initData() {
     _undoableIndex.state = widget.initialIndex;
 
     controllerSubscription =
@@ -170,8 +170,18 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     return switch (event) {
       ControllerSwipeEvent(:final direction) => _swipe(direction),
       ControllerUndoEvent() => _undo(),
+      ControllerRefreshEvent() => _refresh(),
       ControllerMoveEvent(:final index) => _moveTo(index),
     };
+  }
+
+  void _refresh() {
+    _undoableIndex = Undoable<int?>(null);
+    _directionHistory = Queue();
+    deletedList = [];
+    initData();
+
+    setState(() {});
   }
 
   void _animationListener() {

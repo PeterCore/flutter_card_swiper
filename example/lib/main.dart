@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:example/example_candidate_model.dart';
 import 'package:example/example_card.dart';
 import 'package:flutter/material.dart';
@@ -42,18 +40,7 @@ class _ExamplePageState extends State<Example> {
           children: [
             Flexible(
               child: CardSwiper(
-                onDeleted: (index) {
-                  // print("index is ${index}");
-                  // final before = cards.sublist(0, index);
-                  // final after = cards.sublist(index + 1);
-                  // setState(() {
-                  //   cards = [...after, ...before];
-                  //   print("11111 is ${index}");
-                  // });
-                  // setState(() {
-                  //   cards.removeAt(index);
-                  // });
-                },
+                onDeleted: (index) {},
                 controller: controller,
                 cardsCount: cards.length,
                 allowedSwipeDirection: const AllowedSwipeDirection.only(
@@ -64,7 +51,7 @@ class _ExamplePageState extends State<Example> {
                 vThreshold: 200,
                 onUndo: _onUndo,
                 isLoop: false,
-                numberOfCardsDisplayed: min(cards.length, 4),
+                numberOfCardsDisplayed: 3,
                 backCardOffset: const Offset(0, -40),
                 padding: const EdgeInsets.all(24),
                 cardBuilder: (
@@ -83,7 +70,10 @@ class _ExamplePageState extends State<Example> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   FloatingActionButton(
-                    onPressed: controller.undo,
+                    onPressed: () {
+                      setState(() {});
+                      controller.refresh();
+                    },
                     child: const Icon(Icons.rotate_left),
                   ),
                   FloatingActionButton(
