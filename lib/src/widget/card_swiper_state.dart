@@ -11,7 +11,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   CardSwiperDirection _detectedVerticalDirection = CardSwiperDirection.none;
   bool _tappedOnTop = false;
 
-  Undoable<int?> _undoableIndex = Undoable<int?>(null);
+  final _undoableIndex = Undoable<int?>(null);
   Queue<CardSwiperDirection> _directionHistory = Queue();
   List<int> deletedList = [];
   int? get _currentIndex => _undoableIndex.state;
@@ -176,12 +176,11 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   }
 
   void _refresh() {
-    _undoableIndex = Undoable<int?>(null);
+    _undoableIndex.state = widget.initialIndex;
+    _numberOfCardsDisplayed = widget.numberOfCardsDisplayed;
     _directionHistory = Queue();
     deletedList = [];
-    initData();
-
-    setState(() {});
+    _reset();
   }
 
   void _animationListener() {
