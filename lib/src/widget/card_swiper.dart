@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_card_swiper/src/card_animation.dart';
@@ -37,6 +38,8 @@ class CardSwiper extends StatefulWidget {
   ///
   /// If `null`, the swiper can only be controlled by user input.
   final CardSwiperController? controller;
+
+  Future<bool> Function()? onAllowedDeleted;
 
   /// The duration of each swipe animation.
   ///
@@ -132,7 +135,7 @@ class CardSwiper extends StatefulWidget {
   /// Must be a positive value. Defaults to Offset(0, 40).
   final Offset backCardOffset;
 
-  const CardSwiper({
+  CardSwiper({
     required this.cardBuilder,
     required this.cardsCount,
     this.controller,
@@ -152,9 +155,10 @@ class CardSwiper extends StatefulWidget {
     this.isLoop = true,
     this.isVloop = false,
     this.isHloop = true,
+    this.onDeleted,
     this.numberOfCardsDisplayed = 2,
     this.onUndo,
-    this.onDeleted,
+    this.onAllowedDeleted,
     this.backCardOffset = const Offset(0, 40),
     super.key,
     this.hThreshold = 50,

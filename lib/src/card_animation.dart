@@ -57,21 +57,19 @@ class CardAnimation {
   }
 
   void update(double dx, double dy, bool inverseAngle) {
-    if (left >= 0 && dy.abs() < dx.abs()) {
+    if (left >= 0) {
       onSwipeDirectionChanged?.call(CardSwiperDirection.right);
       left += dx;
-    } else if (left <= 0 && dy.abs() < dx.abs()) {
+    } else if (left <= 0) {
       onSwipeDirectionChanged?.call(CardSwiperDirection.left);
       left += dx;
     }
-
-    if (top >= 0 && dy.abs() > dx.abs()) {
+    if (top >= 0) {
       onSwipeDirectionChanged?.call(CardSwiperDirection.bottom);
       top += dy;
-    } else if (top <= 0 && dy.abs() > dx.abs()) {
+    } else if (top <= 0) {
       onSwipeDirectionChanged?.call(CardSwiperDirection.top);
       top += dy;
-      print('top is $top');
     }
     /////////////
     /*if (allowedSwipeDirection.right && allowedSwipeDirection.left) {
@@ -154,7 +152,45 @@ class CardAnimation {
 
   void animate(BuildContext context, CardSwiperDirection direction) {
     if (direction == CardSwiperDirection.none) return;
-    animateToAngle(context, direction.angle);
+    // animateToAngle(context, direction.angle);
+    final vector = Offset(left, top);
+    if (vector.distance < 1) {
+      _animateAlongVector(context, Offset(1, 0));
+    } else {
+      _animateAlongVector(context, vector);
+    }
+  }
+
+  void _animateAlongVector(BuildContext context, Offset vector) {
+    final size = MediaQuery.of(context).size;
+    final magnitude =
+        math.sqrt(size.width * size.width + size.height * size.height);
+
+    final unit = vector / vector.distance;
+    final target = unit * magnitude;
+
+    _leftAnimation = Tween<double>(
+      begin: left,
+      end: target.dx,
+    ).animate(animationController);
+
+    _topAnimation = Tween<double>(
+      begin: top,
+      end: target.dy,
+    ).animate(animationController);
+
+    _scaleAnimation = Tween<double>(
+      begin: scale,
+      end: 1.0,
+    ).animate(animationController);
+
+    _differenceAnimation = Tween<Offset>(
+      begin: difference,
+      end: initialOffset,
+    ).animate(animationController);
+
+    // —— 4) 播放 ——
+    animationController.forward();
   }
 
   void animateToAngle(BuildContext context, double targetAngle) {
@@ -191,23 +227,64 @@ class CardAnimation {
     animationController.forward();
   }
 
+  // void animateBack(BuildContext context) {
+  //   _leftAnimation = Tween<double>(
+  //     begin: left,
+  //     end: 0,
+  //   ).animate(animationController);
+  //   _topAnimation = Tween<double>(
+  //     begin: top,
+  //     end: 0,
+  //   ).animate(animationController);
+  //   _scaleAnimation = Tween<double>(
+  //     begin: scale,
+  //     end: initialScale,
+  //   ).animate(animationController);
+  //   _differenceAnimation = Tween<Offset>(
+  //     begin: difference,
+  //     end: Offset.zero,
+  //   ).animate(animationController);
+  //   animationController.forward();
+  // }
   void animateBack(BuildContext context) {
-    _leftAnimation = Tween<double>(
-      begin: left,
-      end: 0,
-    ).animate(animationController);
-    _topAnimation = Tween<double>(
-      begin: top,
-      end: 0,
-    ).animate(animationController);
-    _scaleAnimation = Tween<double>(
-      begin: scale,
-      end: initialScale,
-    ).animate(animationController);
-    _differenceAnimation = Tween<Offset>(
-      begin: difference,
-      end: Offset.zero,
-    ).animate(animationController);
+    final overshootLeft = left != 0 ? ((left > 0) ? -10.0 : 10.0) : 0.0;
+    final overshootTop = top != 0 ? ((top > 0) ? -10.0 : 10.0) : 0.0;
+
+    _leftAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: left, end: overshootLeft)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: overshootLeft, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50,
+      ),
+    ]).animate(animationController);
+
+    // 同理 top
+    _topAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: top, end: overshootTop)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: overshootTop, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50,
+      ),
+    ]).animate(animationController);
+
+    _scaleAnimation = Tween<double>(begin: scale, end: initialScale)
+        .chain(CurveTween(curve: Curves.easeInOut))
+        .animate(animationController);
+
+    _differenceAnimation = Tween<Offset>(begin: difference, end: Offset.zero)
+        .chain(CurveTween(curve: Curves.easeInOut))
+        .animate(animationController);
+
     animationController.forward();
   }
 

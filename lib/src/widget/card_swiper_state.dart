@@ -231,7 +231,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   }
 
   bool _currentSwipDirectionIsDeleted() {
-    bool isDeleted = false;
+    var isDeleted = false;
     final direction = _getEndAnimationDirection();
     if (direction == CardSwiperDirection.top &&
         widget.allowedDeleteDirection.up) {
@@ -248,15 +248,18 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     final isValidDirection = _isValidDirection(direction);
     if (isValidDirection) {
       _swipe(direction);
-      // setState(() {
-      //   _numberOfCardsDisplayed = numberOfCardsOnScreen();
-      // });
     } else {
       if (_currentSwipDirectionIsDeleted()) {
-        setState(() {
-          _numberOfCardsDisplayed = numberOfCardsOnScreen();
+        widget.onAllowedDeleted?.call().then((value) {
+          if (!value) {
+            _goBack();
+          } else {
+            _swipe(direction);
+            setState(() {
+              _numberOfCardsDisplayed = numberOfCardsOnScreen();
+            });
+          }
         });
-        _swipe(direction);
       } else {
         _goBack();
       }
@@ -268,8 +271,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
       return _cardAnimation.left.isNegative
           ? CardSwiperDirection.left
           : CardSwiperDirection.right;
-    }
-    if (_cardAnimation.top.abs() > widget.vThreshold) {
+    } else if (_cardAnimation.top.abs() > widget.vThreshold) {
       return _cardAnimation.top.isNegative
           ? CardSwiperDirection.top
           : CardSwiperDirection.bottom;
@@ -331,14 +333,16 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   }
 
   int numberOfCardsOnScreen() {
-    if (widget.isHloop && _cardAnimation.left.abs() > 7) {
+    if (widget.isHloop && _cardAnimation.left.abs() > widget.hThreshold) {
       return _numberOfCardsDisplayed;
-    } else if (widget.isVloop && _cardAnimation.top.abs() > 7) {
+    } else if (widget.isVloop && _cardAnimation.top.abs() > widget.vThreshold) {
       return _numberOfCardsDisplayed;
     }
     if (_currentIndex == null) {
       return 0;
     }
+
+    print("deleted is ${_currentIndex}");
     deletedList.add(_currentIndex ?? 0);
     return math.min(
       _numberOfCardsDisplayed,
